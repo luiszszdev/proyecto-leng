@@ -2,12 +2,14 @@
 #include <conio.h>
 #include <string.h>
 #include <ctype.h>
+#include <stdlib.h>
 
 #define long 20
 
 int opcion, confirmacion, encontrado, i, j, cantidad_vender, inten = 1;
 char ch;
 char busqueda[100];
+
 
 struct veri {
     char auser[10], apass[20];
@@ -38,8 +40,6 @@ struct cliente clientes[100];
 
 
 int total_productos = 0, total_clientes = 0;
-
-
 
 void agregar_cliente(void) {
     clrscr();
@@ -402,6 +402,7 @@ void inicio(void){
 }
 
 int main() {
+   
     inicio();
     return 0;
 }
