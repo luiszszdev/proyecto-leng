@@ -41,7 +41,77 @@ struct cliente clientes[100];
 
 int total_productos = 0, total_clientes = 0;
 
+/*PRUEBAS*/
+
+void cargar_total_productos(void) {
+    FILE *pc = fopen("c:\\tc20\\product\\total_productos.txt", "a+");
+
+    if (pc != NULL) {
+        fscanf(pc, "%d", &total_productos);
+        fclose(pc);
+    }
+}
+
+void cargar_productos(void) {
+    FILE *pa;
+    pa = fopen("c:\\tc20\\product\\inventar.txt", "a+");
+
+    if (pa == NULL) {
+        printf("No se pudo abrir el archivo de productos.\n");
+        getch();
+        return;
+    }
+
+    while (fscanf(pa, "%s\n%s\n%d\n%d\n%s\n%s\n%s\n", 
+        inventario[total_productos].codigo,
+        inventario[total_productos].nombre,
+        &inventario[total_productos].precio,
+        &inventario[total_productos].cantidad,
+        inventario[total_productos].unidad,
+        inventario[total_productos].descripcion,
+        inventario[total_productos].fecha_venc) != EOF) {
+
+        total_productos++;
+    }
+
+    fclose(pa);
+}
+
+void cargar_clientes(void) {
+    FILE *pa;
+    pa = fopen("c:\\tc20\\product\\clientes.txt", "a+");
+
+    if (pa == NULL) {
+        printf("No se pudo abrir el archivo de clientes.\n");
+        getch();
+        return;
+    }
+
+    while (fscanf(pa, "%s\n%s\n%s\n%s\n%d\n", 
+        clientes[total_clientes].codigo,
+        clientes[total_clientes].nombre,
+        clientes[total_clientes].telefono,
+        clientes[total_clientes].direccion,
+        &clientes[total_clientes].credito) != EOF) {
+
+        total_clientes++;
+    }
+
+    fclose(pa);
+}
+
+/**/
+
 void agregar_cliente(void) {
+    FILE *pa;
+    pa = fopen("c:\\tc20\\product\\clientes.txt", "a+");
+
+    if (pa == NULL) {
+        printf("No se pudo abrir el archivo.\n");
+        getch();
+        return;
+    }
+    
     clrscr();
 
     if (total_clientes >= 100) {
@@ -61,7 +131,15 @@ void agregar_cliente(void) {
     printf("Ingrese el codigo del cliente: ");
     scanf("%s", clientes[total_clientes].codigo);
 
+    fprintf(pa, "%s\n", clientes[total_clientes].codigo);
+    fprintf(pa, "%s\n", clientes[total_clientes].nombre);
+    fprintf(pa, "%s\n", clientes[total_clientes].telefono);
+    fprintf(pa, "%s\n", clientes[total_clientes].direccion);
+    fprintf(pa, "%d\n", clientes[total_clientes].credito);
+
     total_clientes++;
+    fclose(pa);
+   
     printf("Cliente agregado exitosamente.\n");
     getch();
 }
@@ -94,7 +172,16 @@ void mostrar_clientes(void) {
 
 
 void agregar_producto(void) {
+    FILE *pa, *pc;
+    pa = fopen("c:\\tc20\\product\\inventar.txt", "a+");
+    pc = fopen("c:\\tc20\\product\\total_productos.txt", "a+");
     clrscr();
+
+    if (pa == NULL) {  
+        printf("Error al abrir el archivo.\n");
+        getch();
+        return;
+    }
 
     if (total_productos >= 100) {
         printf("No se pueden agregar mas productos.\n");
@@ -103,22 +190,42 @@ void agregar_producto(void) {
 
     printf("Ingrese el nombre del producto: ");
     scanf(" %[^\n]", inventario[total_productos].nombre);
+    
     printf("Ingrese el precio del producto: ");
     scanf("%d", &inventario[total_productos].precio);
+    
     printf("Ingrese la cantidad del producto: ");
     scanf("%d", &inventario[total_productos].cantidad);
+	
     printf("Ingrese la unidad de medida: ");
-    scanf("%s", inventario[total_productos].unidad);
+    scanf(" %[^\n]", inventario[total_productos].unidad);
+    
     printf("Ingrese la descripcion del producto: ");
     scanf(" %[^\n]", inventario[total_productos].descripcion);
+    
     printf("Ingrese la fecha de vencimiento (DD/MM/AAAA): ");
     scanf(" %[^\n]", inventario[total_productos].fecha_venc);
+    
     printf("Ingrese el codigo del producto: ");
     scanf("%s", inventario[total_productos].codigo);
+    
 
+    /*esto es para guardar en el archivo*/
 
+    fprintf(pa, "%s\n", inventario[total_productos].nombre);
+    fprintf(pa, "%d\n", inventario[total_productos].precio);
+    fprintf(pa, "%d\n", inventario[total_productos].cantidad);
+    fprintf(pa, "%s\n", inventario[total_productos].unidad);
+    fprintf(pa, "%s\n", inventario[total_productos].descripcion);
+    fprintf(pa, "%s\n", inventario[total_productos].fecha_venc);
+    fprintf(pa, "%s\n", inventario[total_productos].codigo);
 
+    
     total_productos++;
+    fprintf(pc, "%d", total_productos);
+    fclose(pc);
+    fclose(pa);
+
     printf("Producto agregado exitosamente.\n");
     getch();
 }
@@ -386,6 +493,7 @@ void inicio(void){
 
         if(strcmp(usuario.auser, "admin") == 0){
             if(strcmp(usuario.apass, "euclides") == 0){
+                
                 menu_principal();
                 inten = 4;
             }else{
@@ -402,7 +510,9 @@ void inicio(void){
 }
 
 int main() {
-   
+    cargar_total_productos();
+    cargar_clientes();
+    cargar_productos();
     inicio();
     return 0;
 }
