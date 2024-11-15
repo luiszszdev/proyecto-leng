@@ -44,7 +44,7 @@ int total_productos = 0, total_clientes = 0;
 /*PRUEBAS*/
 
 void cargar_total_productos(void) {
-    FILE *pc = fopen("c:\\tc20\\product\\total_productos.txt", "a+");
+    FILE *pc = fopen("c:\\tc20\\product\\total_productos.txt", "r");
 
     if (pc != NULL) {
         fscanf(pc, "%d", &total_productos);
@@ -54,7 +54,7 @@ void cargar_total_productos(void) {
 
 void cargar_productos(void) {
     FILE *pa;
-    pa = fopen("c:\\tc20\\product\\inventar.txt", "a+");
+    pa = fopen("c:\\tc20\\product\\productos.txt", "r");
 
     if (pa == NULL) {
         printf("No se pudo abrir el archivo de productos.\n");
@@ -62,14 +62,14 @@ void cargar_productos(void) {
         return;
     }
 
-    while (fscanf(pa, "%s\n%s\n%d\n%d\n%s\n%s\n%s\n", 
-        inventario[total_productos].codigo,
+    while (fscanf(pa, "\n%s\n%s\n%d\n%d\n%s\n%s\n%s\n", 
         inventario[total_productos].nombre,
         &inventario[total_productos].precio,
         &inventario[total_productos].cantidad,
         inventario[total_productos].unidad,
         inventario[total_productos].descripcion,
-        inventario[total_productos].fecha_venc) != EOF) {
+		inventario[total_productos].fecha_venc,
+		inventario[total_productos].codigo) != EOF) {
 
         total_productos++;
     }
@@ -79,7 +79,7 @@ void cargar_productos(void) {
 
 void cargar_clientes(void) {
     FILE *pa;
-    pa = fopen("c:\\tc20\\product\\clientes.txt", "a+");
+    pa = fopen("c:\\tc20\\product\\clientes.txt", "r");
 
     if (pa == NULL) {
         printf("No se pudo abrir el archivo de clientes.\n");
@@ -173,8 +173,8 @@ void mostrar_clientes(void) {
 
 void agregar_producto(void) {
     FILE *pa, *pc;
-    pa = fopen("c:\\tc20\\product\\inventar.txt", "a+");
-    pc = fopen("c:\\tc20\\product\\total_productos.txt", "a+");
+    pa = fopen("c:\\tc20\\product\\productos.txt", "a+");
+    pc = fopen("c:\\tc20\\product\\total_productos.txt", "w+");
     clrscr();
 
     if (pa == NULL) {  
@@ -240,14 +240,14 @@ void buscar_producto(void) {
     for ( i = 0; i < total_productos; i++) {
         if (strcmp(inventario[i].nombre, busqueda) == 0 || strcmp(inventario[i].codigo, busqueda) == 0) {
             encontrado = 1;
-            printf("Producto encontrado:\n");
+            printf("Producto encontrado:\n\n");
             printf("Nombre: %s\n", inventario[i].nombre);
-            printf("Codigo: %s\n", inventario[i].codigo);
             printf("Precio: %d\n", inventario[i].precio);
             printf("Cantidad: %d\n", inventario[i].cantidad);
-            printf("Descripcion: %s\n", inventario[i].descripcion);
             printf("Unidad: %s\n", inventario[i].unidad);
+            printf("Descripcion: %s\n", inventario[i].descripcion);
             printf("Fecha de vencimiento: %s\n", inventario[i].fecha_venc);
+            printf("Codigo: %s\n", inventario[i].codigo);
             getch();
 
         }
@@ -281,7 +281,7 @@ void actualizar_producto(void) {
             printf("Nueva descripcion (actual: %s): ", inventario[i].descripcion);
             scanf(" %[^\n]", inventario[i].descripcion);
             printf("Nueva fecha de vencimiento (actual: %s): ", inventario[i].fecha_venc);
-            scanf("%s", inventario[i].fecha_venc);
+            scanf(" %[^\n]", inventario[i].fecha_venc);
             printf("Producto actualizado exitosamente.\n");
             getch();
 
@@ -334,18 +334,16 @@ void ver_productos(void) {
         getch();
     }
 
-    printf("%-8s | %-10s | %-8s | %-8s | %-8s | %-15s\n", "Codigo", "Nombre", "Precio", "Cantidad", "Unidad", "Fecha Venc.");
-    printf("--------------------------------------------------------------------------------\n");
-
     for (i = 0; i < total_productos; i++) {
-        printf("%-8s | %-10s | %-8d | %-8d | %-10s | %-10s\n",
-        inventario[i].codigo,
-        inventario[i].nombre,
-        inventario[i].precio,
-        inventario[i].cantidad,
-        inventario[i].unidad,
-        inventario[i].fecha_venc);
-        printf("--------------------------------------------------------------------------------\n");
+        
+        printf("Nombre: %s\n", inventario[i].nombre);
+        printf("Precio: %d\n", inventario[i].precio);
+        printf("Cantidad: %d\n", inventario[i].cantidad);
+        printf("Unidad: %s\n", inventario[i].unidad);
+        printf("Descripcion: %s\n", inventario[i].descripcion);
+        printf("Fecha de vencimiento: %s\n", inventario[i].fecha_venc);
+        printf("Codigo: %s\n", inventario[i].codigo);
+        printf("--------------------------------------------------------------------------------");
     }
 
     getch();
