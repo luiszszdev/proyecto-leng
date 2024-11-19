@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #define long 20
 
-int opcion, confirmacion, encontrado, i, j, k, l, opc, diferencia, cantidad_vender, inten = 1, total_venta, pago;
+int opcion, confirmacion, encontrado, i, j, k, l, opc, diferencia, cantidad_vender, inten = 1, total_venta, pago, efectivo;
 char ch;
 char busqueda[100];
 
@@ -143,13 +143,15 @@ void mostrar_clientes(void) {
     }
 
     printf("Lista de Clientes Registrados:\n");
+    printf("%-15s | %-10s | %-8s | %-8s\n", "Nombre", "Telefono", "Codigo", "Credito");
+    printf("--------------------------------------------------------------------------------");
     for (i = 0; i < total_clientes; i++) {
-        printf("Nombre: %s\n", clientes[i].nombre);
-		printf("Telefono: %s\n", clientes[i].telefono);
-        printf("Direccion: %s\n", clientes[i].direccion);
-        printf("Codigo: %s\n", clientes[i].codigo);
-        printf("Credito: %d", clientes[i].credito);
-        printf("\n--------------------------------------------------------------------------------");
+        printf("%-15s | %-10s | %-8s | %-8d\n",
+        clientes[i].nombre,
+		clientes[i].telefono,
+        clientes[i].codigo,
+        clientes[i].credito);
+        printf("--------------------------------------------------------------------------------");
     }
     getch();
 }
@@ -526,7 +528,6 @@ void vender_producto(void){
                             printf("Desea pagar la diferencia en efectivo? (1 para si, 0 para no): ");
                             opc = validar(opc);
                             if (opc == 1) {
-                                int efectivo;
                                 printf("Ingrese el monto en efectivo: ");
                                 efectivo = validar(efectivo);
                                 if (efectivo >= diferencia) {                                    
