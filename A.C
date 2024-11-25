@@ -3,6 +3,8 @@
 #include <string.h>
 #include <ctype.h>
 #include <stdlib.h>
+#include <graphics.h>
+
 #define long 20
 
 int opcion, confirmacion, encontrado, i, j, k, l, opc, diferencia, cantidad_vender, inten = 1, total_venta, pago, efectivo;
@@ -690,36 +692,83 @@ void menu_principal(void) {
     }
 }
 
-void inicio(void){
-    while(inten <= 3){
-        clrscr();
-        printf("intento: %d\n\n", inten);
-	    printf("Ingrese su usuario: ");
-	    gets(usuario.auser);
-	    printf("Ingrese la contrasena: ");
-	    while (i < 100 && (ch = getch()) != '\r') {
+void drawUNI() {
+    setcolor(BLUE);
+    setfillstyle(SOLID_FILL, BLUE);
+
+    bar(100, 100, 120, 200);
+    bar(160, 100, 180, 200); 
+    bar(120, 180, 160, 200); 
+
+    bar(200, 100, 220, 200); 
+    bar(260, 100, 280, 200); 
+    bar(220, 100, 260, 120); 
+
+    bar(300, 100, 320, 200); 
+}
+
+void drawFARMA() {
+    setcolor(GREEN);
+    settextstyle(DEFAULT_FONT, HORIZ_DIR, 4); 
+    outtextxy(360, 140, "FARMA");
+}
+
+void inicio(void) {
+    int gd = DETECT, gm;
+    int i, width, height;
+    char ch;
+    char intento_text[10];
+
+    initgraph(&gd, &gm, "C:\\tc20\\bin");
+    width = getmaxx();
+    height = getmaxy();
+
+    while (inten <= 3) {
+        cleardevice();
+        
+        drawUNI();
+        drawFARMA();
+        
+        setcolor(WHITE);
+        settextstyle(DEFAULT_FONT, HORIZ_DIR, 1);
+        
+        outtextxy((width - 150) / 2, 220, "Ingrese su usuario: ");
+        gets(usuario.auser);
+
+        outtextxy((width - 150) / 2, 240, "Ingrese la contrasena: ");
+        i = 0;
+        while (i < 100 && (ch = getch()) != '\r') {
             usuario.apass[i] = ch;
             printf("*");
             i++;
         }
         usuario.apass[i] = '\0';
 
-        if(strcmp(usuario.auser, "admin") == 0){
-            if(strcmp(usuario.apass, "euclides") == 0){
-                
+        if (strcmp(usuario.auser, "admin") == 0) {
+            if (strcmp(usuario.apass, "euclides") == 0) {
+                cleardevice();
                 menu_principal();
+                getch();
                 inten = 4;
-            }else{
+            } else {
                 printf("\nCONTRASENA INCORRECTA");
                 inten++;
                 getch();
             }
-        }else{
+        } else {
             printf("\nUSUARIO INCORRECTO");
             inten++;
             getch();
         }
     }
+
+    if (inten > 3) {
+        cleardevice();
+        outtextxy(20, 200, "Demasiados intentos fallidos.");
+        getch();
+    }
+
+    closegraph();
 }
 
 int main() {
