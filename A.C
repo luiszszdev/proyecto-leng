@@ -3,16 +3,14 @@
 #include <string.h>
 #include <ctype.h>
 #include <stdlib.h>
+#include <ayuda.h>
 #include <graphics.h>
-
 #define long 20
 
 int opcion, confirmacion, encontrado, i, j, k, l, opc, diferencia, cantidad_vender, inten = 1, total_venta, pago, efectivo;
-char ch;
+char ch,  codigo_exis[5], nume[20];
 char busqueda[100];
-
 FILE *pa;
-
 struct veri {
     char auser[10], apass[20];
 } usuario;
@@ -29,28 +27,79 @@ struct producto {
 
 struct cliente {
     char nombre[20];
-    char direccion[80];
+    char direccion[100];
     char codigo[5];
     char telefono[20];
-    int credito;
+    int credito, comp;
 } cli;
-
 struct producto inventario[100];
 struct cliente clientes[100];
 int total_productos = 0, total_clientes = 0;
 
 int validar(int a){
     while (scanf("%d", &a) != 1 || a < 0) {
-        while (getchar() != '\n'); 
+        while (getchar() != '\n');
         printf("Entrada no valida. Por favor, ingrese un numero entero positivo: ");
     }
     return a;
 }
+int existe_producto(char* codigo) {
+	for (i = 0; i < total_productos; i++) {
+        if (strcmp(inventario[i].codigo, codigo) == 0) {
+            return 1;
+        }
+    }
+    return 0;
+}
+int existe_cliente(char* codigo) {
+	for (i = 0; i < total_clientes; i++) {
+        if (strcmp(clientes[i].codigo, codigo) == 0) {
+            return 1;
+        }
+    }
+    return 0;
+}
 
-/*PRUEBAS*/
+void productocarga(void){
+    pa = fopen("c:\\tc20\\product\\productos.txt", "w");
+        if (pa == NULL) {
+            printf("Error al abrir el archivo de productos.\n");
+            getchar();
+            return;
+        }
+        for (i = 0; i < total_productos; i++) {
+            fprintf(pa, "%s\n", inventario[i].nombre);
+            fprintf(pa, "%s\n", inventario[i].unidad);
+            fprintf(pa, "%s\n", inventario[i].descripcion);
+            fprintf(pa, "%s\n", inventario[i].fecha_venc);
+            fprintf(pa, "%s\n", inventario[i].codigo);
+            fprintf(pa, "%d\n", inventario[i].precio);
+            fprintf(pa, "%d\n", inventario[i].cantidad);
+            }
+
+    fclose(pa);
+}
+void clientecarga(void){
+    pa = fopen("c:\\tc20\\product\\clientes.txt", "w");
+        if (pa == NULL) {
+            printf("Error al abrir el archivo de clientes.\n");
+            getchar();
+            return;
+        }
+
+        for (i = 0; i < total_clientes; i++) {
+            fprintf(pa, "%s\n", clientes[i].nombre);
+            fprintf(pa, "%s\n", clientes[i].telefono);
+            fprintf(pa, "%s\n", clientes[i].direccion);
+            fprintf(pa, "%s\n", clientes[i].codigo);
+            fprintf(pa, "%d\n", clientes[i].credito);
+            fprintf(pa, "%d\n", clientes[i].comp);
+        }
+    fclose(pa);
+}
 void cargar_productos(void) {
     FILE *pa;
-    pa = fopen("c:\\tc20\\product\\productos.txt", "r");
+	pa = fopen("c:\\tc20\\product\\productos.txt", "r+");
     if (pa == NULL) {
         printf("No se pudo abrir el archivo de productos.\n");
         getch();
@@ -67,7 +116,7 @@ void cargar_productos(void) {
         inventario[total_productos].fecha_venc[strcspn(inventario[total_productos].fecha_venc, "\n")] = '\0';
         fgets(inventario[total_productos].codigo, sizeof(inventario[total_productos].codigo), pa);
         inventario[total_productos].codigo[strcspn(inventario[total_productos].codigo, "\n")] = '\0';
-        fscanf(pa, "%d", &inventario[total_productos].precio);
+        fscanf(pa, "%d\n", &inventario[total_productos].precio);
         fscanf(pa, "%d\n", &inventario[total_productos].cantidad);
         total_productos++;
     }
@@ -76,7 +125,7 @@ void cargar_productos(void) {
 
 void cargar_clientes(void) {
     FILE *pa;
-    pa = fopen("c:\\tc20\\product\\clientes.txt", "r");
+    pa = fopen("c:\\tc20\\product\\clientes.txt", "r+");
 
     if (pa == NULL) {
         printf("No se pudo abrir el archivo de clientes.\n");
@@ -93,12 +142,12 @@ void cargar_clientes(void) {
         fgets(clientes[total_clientes].codigo, sizeof(clientes[total_clientes].codigo), pa);
         clientes[total_clientes].codigo[strcspn(clientes[total_clientes].codigo, "\n")] = '\0';
         fscanf(pa, "%d\n", &clientes[total_clientes].credito);
+        fscanf(pa, "%d\n", &clientes[total_clientes].comp);
         total_clientes++;
     }
-    
     fclose(pa);
 }
-/**/
+
 void agregar_cliente(void) {
     pa = fopen("c:\\tc20\\product\\clientes.txt", "a+");
     if (pa == NULL) {
@@ -116,18 +165,33 @@ void agregar_cliente(void) {
     scanf(" %[^\n]", clientes[total_clientes].nombre);
     printf("Ingrese el telefono del cliente: ");
     scanf(" %[^\n]", clientes[total_clientes].telefono);
+    while(strlen(clientes[total_clientes].telefono) != 8){
+        printf("\nNumero no valido, ingreselo nuevamente: ");
+        scanf(" %[^\n]", clientes[total_clientes].telefono);
+        }
     printf("Ingrese la direccion del cliente: ");
     scanf(" %[^\n]", clientes[total_clientes].direccion);
     printf("Ingrese el codigo del cliente: ");
-    scanf(" %[^\n]", clientes[total_clientes].codigo);
+    while (1) {
+        printf("Ingrese el codigo del cliente: ");
+        scanf("%s", codigo_exis);
+        if (existe_cliente(codigo_exis)) {
+            printf("El clinete con el codigo '%s' ya existe. Por favor ingrese un codigo diferente.\n", codigo_exis);
+        } else {
+            break;
+        }
+    }
+    strcpy(clientes[total_clientes].codigo, codigo_exis);
     printf("Ingrese el credito del cliente: ");
     clientes[total_clientes].credito = validar(clientes[total_clientes].credito);
+    clientes[total_clientes].comp = 0;
     
     fprintf(pa, "%s\n", clientes[total_clientes].nombre);
     fprintf(pa, "%s\n", clientes[total_clientes].telefono);
     fprintf(pa, "%s\n", clientes[total_clientes].direccion);
     fprintf(pa, "%s\n", clientes[total_clientes].codigo);
     fprintf(pa, "%d\n", clientes[total_clientes].credito);
+    fprintf(pa, "%d\n", clientes[total_clientes].comp);
     
     total_clientes++;
     fclose(pa);
@@ -143,16 +207,16 @@ void mostrar_clientes(void) {
         getch();
         return;
     }
-
     printf("Lista de Clientes Registrados:\n");
-    printf("%-15s | %-10s | %-8s | %-8s\n", "Nombre", "Telefono", "Codigo", "Credito");
+    printf("%-15s | %-10s | %-8s | %-8s | %-8s\n", "Nombre", "Telefono", "Codigo", "Credito", "Recurrencia");
     printf("--------------------------------------------------------------------------------");
     for (i = 0; i < total_clientes; i++) {
-        printf("%-15s | %-10s | %-8s | %-8d\n",
+        printf("%-15s | %-10s | %-8s | %-8d | %-8d\n",
         clientes[i].nombre,
 		clientes[i].telefono,
         clientes[i].codigo,
-        clientes[i].credito);
+        clientes[i].credito,
+        clientes[i].comp);
         printf("--------------------------------------------------------------------------------");
     }
     getch();
@@ -164,7 +228,7 @@ void buscar_clientes(void){
     scanf("%s", busqueda);
     encontrado = 0;
 
-     for ( i = 0; i < total_clientes; i++) {
+    for ( i = 0; i < total_clientes; i++){
         if (strcmp(clientes[i].nombre, busqueda) == 0 || strcmp(clientes[i].codigo, busqueda) == 0) {
             encontrado = 1;
             printf("Producto encontrado:\n\n");
@@ -173,6 +237,7 @@ void buscar_clientes(void){
             printf("Direccion: %s\n", clientes[i].direccion);
             printf("Codigo: %s\n", clientes[i].codigo);
             printf("Credito: %d\n", clientes[i].credito);
+            printf("Recurrencia: %d\n", clientes[i].comp);
             getch();
         }
     }
@@ -197,6 +262,10 @@ void actualizar_clinete(void){
             scanf(" %[^\n]", clientes[i].nombre);  
             printf("Nuevo numero celular (actual: %s): ", clientes[i].telefono);
             scanf(" %[^\n]", clientes[i].telefono);
+             while(strlen(clientes[i].telefono) != 8){
+                printf("\nNumero no valido, ingreselo nuevamente: ");
+                scanf(" %[^\n]", clientes[i].telefono);
+            }
             printf("Nueva direccion (actual: %s): ", clientes[i].direccion);
             scanf(" %[^\n]", clientes[i].direccion);
             printf("Nuevo codigo (actual: %s): ", clientes[i].codigo);
@@ -204,23 +273,15 @@ void actualizar_clinete(void){
             printf("Nuevo credito (actual: %d): ", clientes[i].credito);
 			clientes[total_clientes].credito = validar(clientes[total_clientes].credito);
      
-            pa = fopen("c:\\tc20\\product\\clientes.txt", "w");  
-            if (pa == NULL) {
-                printf("Error al abrir el archivo de productos.\n");
-                getchar();
-                return;
-            }
-            for (i = 0; i < total_clientes; i++) {
-                fprintf(pa, "%s\n", clientes[total_clientes].nombre);
-                fprintf(pa, "%s\n", clientes[total_clientes].telefono);
-                fprintf(pa, "%s\n", clientes[total_clientes].direccion);
-                fprintf(pa, "%s\n", clientes[total_clientes].codigo);
-                fprintf(pa, "%d\n", clientes[total_clientes].credito);
-            }fclose(pa);
+            clientecarga();
             printf("Producto actualizado exitosamente.\n");
-            getchar(); 
+            getch(); 
             return;
         }
+    }
+    if (!encontrado) {
+        printf("Cliente no encontrado.\n");
+        getch();
     }
 }
 
@@ -242,21 +303,7 @@ void eliminar_cliente(void){
                 }
                 total_productos--;
                 printf("\nCliente eliminado exitosamente.\n");
-                pa = fopen("c:\\tc20\\product\\clientes.txt", "w");  
-                if (pa == NULL) {
-                    printf("Error al abrir el archivo de clientes.\n");
-                    getchar();
-                    return;
-                }
-
-                for (i = 0; i < total_clientes; i++) {
-                    fprintf(pa, "%s\n", clientes[total_clientes].nombre);
-                    fprintf(pa, "%s\n", clientes[total_clientes].telefono);
-                    fprintf(pa, "%s\n", clientes[total_clientes].direccion);
-                    fprintf(pa, "%s\n", clientes[total_clientes].codigo);
-                    fprintf(pa, "%d\n", clientes[total_clientes].credito);
-                }
-                fclose(pa);
+                clientecarga();
             } else {
                 printf("\nEliminacion cancelada.\n");
             }
@@ -279,12 +326,10 @@ void agregar_producto(void) {
         getch();
         return;
     }
-
     if (total_productos >= 100) {
         printf("No se pueden agregar mas productos.\n");
         return;
     }
-
     printf("Ingrese el nombre del producto: ");
     scanf(" %[^\n]", inventario[total_productos].nombre);
     printf("Ingrese la unidad de medida: ");
@@ -293,13 +338,20 @@ void agregar_producto(void) {
     scanf(" %[^\n]", inventario[total_productos].descripcion);
     printf("Ingrese la fecha de vencimiento (DD/MM/AAAA): ");
     scanf(" %[^\n]", inventario[total_productos].fecha_venc);
-    printf("Ingrese el codigo del producto: ");
-    scanf("%s", inventario[total_productos].codigo);
+    while (1) {
+        printf("Ingrese el codigo del producto: ");
+        scanf("%s", codigo_exis);
+        if (existe_producto(codigo_exis)) {
+            printf("El producto con el codigo '%s' ya existe en el inventario. Por favor ingrese un codigo diferente.\n", codigo_exis);
+        } else {
+            break;
+        }
+    }
+    strcpy(inventario[total_productos].codigo, codigo_exis);
     printf("Ingrese el precio del producto: ");
     inventario[total_productos].precio = validar(inventario[total_productos].precio);
     printf("Ingrese la cantidad del producto: ");
     inventario[total_productos].cantidad = validar(inventario[total_productos].cantidad);
-    
     /*esto es para guardar en el archivo*/
     fprintf(pa, "%s\n", inventario[total_productos].nombre);
     fprintf(pa, "%s\n", inventario[total_productos].unidad);
@@ -353,7 +405,6 @@ void actualizar_producto(void) {
             encontrado = 1;
             printf("Producto encontrado. Ingrese los nuevos datos:\n");
 
-            
             printf("Nuevo nombre (actual: %s): ", inventario[i].nombre);
             scanf(" %[^\n]", inventario[i].nombre);  
             printf("Nueva unidad de medida (actual: %s): ", inventario[i].unidad);
@@ -362,32 +413,14 @@ void actualizar_producto(void) {
             scanf(" %[^\n]", inventario[i].descripcion);
             printf("Nueva fecha de vencimiento (actual: %s): ", inventario[i].fecha_venc);
             scanf(" %[^\n]", inventario[i].fecha_venc);
-            printf("Nuevo codigo (actual: %s): ", inventario[i].codigo);
-            scanf(" %[^\n]", inventario[i].codigo);
             printf("Nuevo precio (actual: %d): ", inventario[i].precio);
             inventario[total_productos].precio = validar(inventario[total_productos].precio);
             printf("Nueva cantidad (actual: %d): ", inventario[i].cantidad);
             inventario[total_productos].cantidad = validar(inventario[total_productos].cantidad);
 
-            pa = fopen("c:\\tc20\\product\\productos.txt", "w");  
-            if (pa == NULL) {
-                printf("Error al abrir el archivo de productos.\n");
-                getchar();
-                return;
-            }
-            for (i = 0; i < total_productos; i++) {
-                fprintf(pa, "%s\n", inventario[i].nombre);
-                fprintf(pa, "%s\n", inventario[i].unidad);
-                fprintf(pa, "%s\n", inventario[i].descripcion);
-                fprintf(pa, "%s\n", inventario[i].fecha_venc);
-                fprintf(pa, "%s\n", inventario[i].codigo);
-                fprintf(pa, "%d\n", inventario[i].precio);
-                fprintf(pa, "%d\n", inventario[i].cantidad);
-            }
-
-            fclose(pa);
+            productocarga();
             printf("Producto actualizado exitosamente.\n");
-            getchar(); 
+            getch(); 
             return;
         }
     }
@@ -416,23 +449,8 @@ void eliminar_producto(void){
                 }
                 total_productos--;
                 printf("\nProducto eliminado exitosamente.\n");
-                pa = fopen("c:\\tc20\\product\\productos.txt", "w");  
-                if (pa == NULL) {
-                    printf("Error al abrir el archivo de productos.\n");
-                    getchar();
-                    return;
-                }
-
-                for (i = 0; i < total_productos; i++) {
-                    fprintf(pa, "%s\n", inventario[i].nombre);
-                    fprintf(pa, "%s\n", inventario[i].unidad);
-                    fprintf(pa, "%s\n", inventario[i].descripcion);
-                    fprintf(pa, "%s\n", inventario[i].fecha_venc);
-                    fprintf(pa, "%s\n", inventario[i].codigo);
-                    fprintf(pa, "%d\n", inventario[i].precio);
-                    fprintf(pa, "%d\n", inventario[i].cantidad);
-                }
-                fclose(pa);
+                productocarga();
+                getch();
             } else {
                 printf("\nEliminacion cancelada.\n");
             }
@@ -478,6 +496,7 @@ void vender_producto(void){
             encontrado = 1;
             printf("Producto encontrado: %s\n", inventario[i].nombre);
             printf("Cantidad disponible: %d\n", inventario[i].cantidad);
+            printf("Precio: %d\n", inventario[i].precio);
             printf("Ingrese la cantidad que desea vender: ");
             cantidad_vender = validar(cantidad_vender);
             if (cantidad_vender > inventario[i].cantidad) {
@@ -492,76 +511,39 @@ void vender_producto(void){
                     if (strcmp(clientes[k].nombre, busqueda) == 0 || strcmp(clientes[k].codigo, busqueda) == 0) {
                         encontrado = 1;
                         printf("Cliente encontrado: %s\n", clientes[k].nombre);
-                        printf("Credito disponible: %d\n", clientes[k].credito);                    
+                        printf("Credito disponible: %d\n", clientes[k].credito);
+                        printf("Veces que a comprado: %d\n", clientes[k].comp);
+
+                        if (clientes[k].comp >= 50) {
+                        total_venta = total_venta * 50 / 100;  
+                        } else if (clientes[k].comp >= 20) {
+                        total_venta = total_venta * 20 / 100;  
+                        } else if (clientes[k].comp >= 10) {
+                        total_venta = total_venta * 15 / 100;  
+                        } else if (clientes[k].comp >= 5) {
+                        total_venta = total_venta * 5 / 100;  
+                        }              
                         if (clientes[k].credito >= total_venta) {                           
-                            clientes[k].credito -= total_venta;                             
-                            pa = fopen("c:\\tc20\\product\\clientes.txt", "w");
-                            if (pa == NULL) {
-                                printf("Error al abrir el archivo de clientes.\n");
-                                return;
-                            }
-                            for ( l = 0; l < total_clientes; l++) {
-								fprintf(pa, "%s\n", clientes[l].nombre);
-								fprintf(pa, "%s\n", clientes[l].telefono);
-								fprintf(pa, "%s\n", clientes[l].direccion);
-								fprintf(pa, "%s\n", clientes[l].codigo);
-								fprintf(pa, "%d\n", clientes[l].credito);
-                            }
-							fclose(pa);
-                            pa = fopen("c:\\tc20\\product\\productos.txt", "w");
-                            if (pa == NULL) {
-                            printf("Error al abrir el archivo de productos.\n");
-                            return;
-                            }
-				            for (j = 0; j < total_productos; j++) {
-                                fprintf(pa, "%s\n", inventario[j].nombre);
-                                fprintf(pa, "%s\n", inventario[j].unidad);
-                                fprintf(pa, "%s\n", inventario[j].descripcion);
-                                fprintf(pa, "%s\n", inventario[j].fecha_venc);
-                                fprintf(pa, "%s\n", inventario[j].codigo);
-                                fprintf(pa, "%d\n", inventario[j].precio);
-                                fprintf(pa, "%d\n", inventario[j].cantidad);
-                            }
-                            fclose(pa);
+                            clientes[k].credito -= total_venta; 
+                            clientes[k].comp++;                            
+                            clientecarga();
+                            productocarga();
                             printf("Venta exitosa. Ha vendido %d unidades de %s. Total venta: %d\n", cantidad_vender, inventario[i].nombre, total_venta);
+                            getch();
                         } else {                            
                             diferencia = total_venta - clientes[k].credito;
                             printf("Credito insuficiente. Faltan %d para completar la compra.\n", diferencia);
-                            printf("Desea pagar la diferencia en efectivo? (1 para si, 0 para no): ");
+                            printf("Desea hacer una recarga de credito (1 para si, 0 para no): \n");
                             opc = validar(opc);
                             if (opc == 1) {
-                                printf("Ingrese el monto en efectivo: ");
+                                printf("Ingrese el monto de la recarga: ");
                                 efectivo = validar(efectivo);
-                                if (efectivo >= diferencia) {                                    
-                                    clientes[k].credito = 0;  
-									if (pa == NULL) {
-                                        printf("Error al abrir el archivo de clientes.\n");
-                                        return;
-                                    }
-                                    for ( l = 0; l < total_clientes; l++) {
-										fprintf(pa, "%s\n", clientes[l].nombre);
-										fprintf(pa, "%s\n", clientes[l].telefono);
-										fprintf(pa, "%s\n", clientes[l].direccion);
-										fprintf(pa, "%s\n", clientes[l].codigo);
-										fprintf(pa, "%d\n", clientes[l].credito);
-                                    }
-									fclose(pa);
-                                    pa = fopen("c:\\tc20\\product\\productos.txt", "w");
-                                    if (pa == NULL) {
-                                        printf("Error al abrir el archivo de productos.\n");
-                                        return;
-                                    }
-				                    for (j = 0; j < total_productos; j++) {
-                                        fprintf(pa, "%s\n", inventario[j].nombre);
-                                        fprintf(pa, "%s\n", inventario[j].unidad);
-                                        fprintf(pa, "%s\n", inventario[j].descripcion);
-                                        fprintf(pa, "%s\n", inventario[j].fecha_venc);
-                                        fprintf(pa, "%s\n", inventario[j].codigo);
-                                        fprintf(pa, "%d\n", inventario[j].precio);
-                                        fprintf(pa, "%d\n", inventario[j].cantidad);
-                                    }
-                                    fclose(pa);
-                                    printf("Venta exitosa. El cliente ha pagado %d en efectivo.\n", efectivo);
+                                if (efectivo >= diferencia) { 
+
+                                    clientes[k].credito = efectivo - diferencia;  
+									clientecarga();
+                                    productocarga();
+                                    printf("Venta exitosa.\n");
                                     printf("Venta realizada: %d unidades de %s. Total venta: %d\n", cantidad_vender, inventario[i].nombre, total_venta);
                                     getch();
                                 } else {
@@ -639,7 +621,7 @@ void menu_clientes(void){
     printf("3. Actualizar cliente\n");
     printf("4. Ver clientes\n");
     printf("5. Eliminar cliente\n");
-    printf("6. Volver");
+    printf("6. Volver\n");
     opcion = validar(opcion);
         switch (opcion)
         {
@@ -669,11 +651,13 @@ void menu_clientes(void){
 
 void menu_principal(void) {
     while (1) {
+        cleardevice();
         clrscr();
         printf("Menu Principal\n");
         printf("1. Inventario\n");
         printf("2. Clientes\n");
-        printf("3. Salir\n");
+        printf("3. Ayuda\n");
+        printf("4. Salir\n");
         printf("Seleccione una opcion: ");
         opcion = validar(opcion);
         switch(opcion) {
@@ -684,6 +668,9 @@ void menu_principal(void) {
                 menu_clientes();
                 break;
             case 3:
+                menuayuda();
+                break;
+            case 4:
                 return;
             default:
                 printf("Opcion invalida.\n");
@@ -692,7 +679,7 @@ void menu_principal(void) {
     }
 }
 
-void drawUNI() {
+void drawUNI(void) {
     setcolor(BLUE);
     setfillstyle(SOLID_FILL, BLUE);
 
@@ -707,7 +694,7 @@ void drawUNI() {
     bar(300, 100, 320, 200); 
 }
 
-void drawFARMA() {
+void drawFARMA(void) {
     setcolor(GREEN);
     settextstyle(DEFAULT_FONT, HORIZ_DIR, 4); 
     outtextxy(360, 140, "FARMA");
@@ -715,14 +702,12 @@ void drawFARMA() {
 
 void inicio(void) {
     int gd = DETECT, gm;
-    int i, width, height;
+    int width;
     char ch;
-    char intento_text[10];
-
+    
     initgraph(&gd, &gm, "C:\\tc20\\bin");
     width = getmaxx();
-    height = getmaxy();
-
+    
     while (inten <= 3) {
         cleardevice();
         
@@ -732,10 +717,11 @@ void inicio(void) {
         setcolor(WHITE);
         settextstyle(DEFAULT_FONT, HORIZ_DIR, 1);
         
-        outtextxy((width - 150) / 2, 220, "Ingrese su usuario: ");
-        gets(usuario.auser);
-
-        outtextxy((width - 150) / 2, 240, "Ingrese la contrasena: ");
+        outtextxy((width - 190) / 2, 220, "Ingrese su usuario: ");
+        gotoxy(30, 16);
+        scanf("%s", usuario.auser);
+        gotoxy(30, 18);
+        outtextxy((width - 190) / 2, 260, "Ingrese la contrasena: ");
         i = 0;
         while (i < 100 && (ch = getch()) != '\r') {
             usuario.apass[i] = ch;
@@ -776,5 +762,4 @@ int main() {
     cargar_productos();
     inicio();
     return 0;
-}
-
+}
