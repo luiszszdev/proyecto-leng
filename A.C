@@ -171,7 +171,6 @@ void agregar_cliente(void) {
         }
     printf("Ingrese la direccion del cliente: ");
     scanf(" %[^\n]", clientes[total_clientes].direccion);
-    printf("Ingrese el codigo del cliente: ");
     while (1) {
         printf("Ingrese el codigo del cliente: ");
         scanf("%s", codigo_exis);
@@ -651,7 +650,6 @@ void menu_clientes(void){
 
 void menu_principal(void) {
     while (1) {
-        cleardevice();
         clrscr();
         printf("Menu Principal\n");
         printf("1. Inventario\n");
@@ -677,6 +675,11 @@ void menu_principal(void) {
                 getch();
         }
     }
+}
+
+void fondo(void){
+    setcolor(BLACK);
+    bar(0, 0, 640, 480);
 }
 
 void drawUNI(void) {
@@ -733,6 +736,7 @@ void inicio(void) {
         if (strcmp(usuario.auser, "admin") == 0) {
             if (strcmp(usuario.apass, "euclides") == 0) {
                 cleardevice();
+                fondo();
                 menu_principal();
                 getch();
                 inten = 4;
@@ -762,4 +766,4 @@ int main() {
     cargar_productos();
     inicio();
     return 0;
-}
+}
