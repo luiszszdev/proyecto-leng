@@ -39,7 +39,8 @@ struct producto inventario[100];
 struct cliente clientes[100];
 int total_productos = 0, total_clientes = 0;
 
-void modo_grafico(void){
+void modo_grafico(void)
+{
     int gd = DETECT, gm;
     initgraph(&gd, &gm, "C:\\tc20\\bin");
 }
@@ -101,6 +102,11 @@ void productocarga(void)
 }
 void clientecarga(void)
 {
+    closegraph();
+    textbackground(BLACK);
+    textcolor(WHITE);
+    clrscr();
+
     pa = fopen("c:\\tc20\\product\\clientes.txt", "w");
     if (pa == NULL)
     {
@@ -120,10 +126,12 @@ void clientecarga(void)
     }
     fclose(pa);
 }
+
 void cargar_productos(void)
 {
     FILE *pa;
     pa = fopen("c:\\tc20\\product\\productos.txt", "r+");
+
     if (pa == NULL)
     {
         printf("No se pudo abrir el archivo de productos.\n");
@@ -148,7 +156,6 @@ void cargar_productos(void)
     }
     fclose(pa);
 }
-
 void cargar_clientes(void)
 {
     FILE *pa;
@@ -180,13 +187,18 @@ void cargar_clientes(void)
 void agregar_cliente(void)
 {
     pa = fopen("c:\\tc20\\product\\clientes.txt", "a+");
+    
+    closegraph();
+    textcolor(WHITE);
+    clrscr();
+
     if (pa == NULL)
     {
         printf("No se pudo abrir el archivo.\n");
         getch();
         return;
     }
-    clrscr();
+    
     if (total_clientes >= 100)
     {
         printf("No se pueden agregar mas clientes.\n");
@@ -243,6 +255,8 @@ void agregar_cliente(void)
 
 void mostrar_clientes(void)
 {
+    closegraph();
+    textcolor(WHITE);
     clrscr();
     if (total_clientes == 0)
     {
@@ -268,6 +282,8 @@ void mostrar_clientes(void)
 
 void buscar_clientes(void)
 {
+    closegraph();
+    textcolor(WHITE);
     clrscr();
     printf("Ingrese el nombre o el codigo del cliente: ");
     scanf("%s", busqueda);
@@ -298,6 +314,8 @@ void buscar_clientes(void)
 
 void actualizar_clinete(void)
 {
+    closegraph();
+    textcolor(WHITE);
     clrscr();
     printf("Ingrese el nombre o el codigo del producto que desea actualizar: ");
     scanf("%s", busqueda);
@@ -320,8 +338,6 @@ void actualizar_clinete(void)
             }
             printf("Nueva direccion (actual: %s): ", clientes[i].direccion);
             scanf(" %[^\n]", clientes[i].direccion);
-            printf("Nuevo codigo (actual: %s): ", clientes[i].codigo);
-            scanf(" %[^\n]", clientes[i].codigo);
             printf("Nuevo credito (actual: %d): ", clientes[i].credito);
             clientes[total_clientes].credito = validar(clientes[total_clientes].credito);
 
@@ -340,6 +356,8 @@ void actualizar_clinete(void)
 
 void eliminar_cliente(void)
 {
+    closegraph();
+    textcolor(WHITE);
     clrscr();
     printf("Ingrese el nombre o el codigo del clinete que desea eliminar: ");
     scanf("%s", busqueda);
@@ -378,91 +396,54 @@ void eliminar_cliente(void)
     }
 }
 
-int gd = DETECT, gm;
-
 void agregar_producto(void)
 {
-    FILE *pa;
-    char codigo_exis[20];
-    int gd = DETECT, gm;
-    int width, height, card_x, card_y;
-
-    pa = fopen("c:\\tc20\\product\\productos.txt", "a+");
-    initgraph(&gd, &gm, "C:\\tc20\\bin");
-    width = getmaxx();
-    height = getmaxy();
-
-    card_x = (width - 400) / 2;
-    card_y = (height - 300) / 2;
-
+    closegraph();
+    textcolor(WHITE);
     clrscr();
+
+    printf("SECCION: AGREGAR PRODUCTO\n\n");
+
+    textcolor(WHITE);
 
     if (pa == NULL)
     {
-        outtextxy(card_x + 20, card_y + 50, "Error al abrir el archivo.");
+        printf("Error al abrir el archivo.\n");
         getch();
-        closegraph();
         return;
     }
-
     if (total_productos >= 100)
     {
-        outtextxy(card_x + 20, card_y + 50, "No se pueden agregar mas productos.");
-        getch();  
-        closegraph();
+        printf("No se pueden agregar mas productos.\n");
         return;
     }
-
-    setcolor(WHITE);
-    rectangle(card_x, card_y, card_x + 400, card_y + 300);
-
-    settextstyle(DEFAULT_FONT, HORIZ_DIR, 2);
-    outtextxy((width - textwidth("* Agregar Producto *")) / 2, card_y + 20, "* Agregar Producto *");
-
-    settextstyle(DEFAULT_FONT, HORIZ_DIR, 1);
-
-    outtextxy(card_x + 20, card_y + 60, "Ingrese el nombre del producto: ");
-    moveto(card_x + 20, card_y + 80);
-    gets(inventario[total_productos].nombre);
-
-    outtextxy(card_x + 20, card_y + 100, "Ingrese la unidad de medida: ");
-    moveto(card_x + 20, card_y + 120);
-    gets(inventario[total_productos].unidad);
-
-    outtextxy(card_x + 20, card_y + 140, "Ingrese la descripcion del producto: ");
-    moveto(card_x + 20, card_y + 160);
-    gets(inventario[total_productos].descripcion);
-
-    outtextxy(card_x + 20, card_y + 180, "Ingrese la fecha de vencimiento (DD/MM/AAAA): ");
-    moveto(card_x + 20, card_y + 200);
-    gets(inventario[total_productos].fecha_venc);
-
+    printf("Ingrese el nombre del producto: ");
+    scanf(" %[^\n]", inventario[total_productos].nombre);
+    printf("Ingrese la unidad de medida: ");
+    scanf(" %[^\n]", inventario[total_productos].unidad);
+    printf("Ingrese la descripcion del producto: ");
+    scanf(" %[^\n]", inventario[total_productos].descripcion);
+    printf("Ingrese la fecha de vencimiento (DD/MM/AAAA): ");
+    scanf(" %[^\n]", inventario[total_productos].fecha_venc);
     while (1)
     {
-        outtextxy(card_x + 20, card_y + 220, "Ingrese el codigo del producto: ");
-        moveto(card_x + 20, card_y + 240);
-        gets(codigo_exis);
-
+        printf("Ingrese el codigo del producto: ");
+        scanf("%s", codigo_exis);
         if (existe_producto(codigo_exis))
         {
-            outtextxy(card_x + 20, card_y + 260, "El producto con el codigo ya existe. Ingrese otro.");
+            printf("El producto con el codigo '%s' ya existe en el inventario. Por favor ingrese un codigo diferente.\n", codigo_exis);
         }
         else
         {
             break;
         }
     }
-
     strcpy(inventario[total_productos].codigo, codigo_exis);
-
-    outtextxy(card_x + 20, card_y + 280, "Ingrese el precio del producto: ");
-    moveto(card_x + 20, card_y + 300);
+    printf("Ingrese el precio del producto: ");
     inventario[total_productos].precio = validar(inventario[total_productos].precio);
-
-    outtextxy(card_x + 20, card_y + 320, "Ingrese la cantidad del producto: ");
-    moveto(card_x + 20, card_y + 340);
+    printf("Ingrese la cantidad del producto: ");
     inventario[total_productos].cantidad = validar(inventario[total_productos].cantidad);
-
+    /*esto es para guardar en el archivo*/
     fprintf(pa, "%s\n", inventario[total_productos].nombre);
     fprintf(pa, "%s\n", inventario[total_productos].unidad);
     fprintf(pa, "%s\n", inventario[total_productos].descripcion);
@@ -473,14 +454,20 @@ void agregar_producto(void)
 
     total_productos++;
     fclose(pa);
-
-    outtextxy(card_x + 20, card_y + 360, "Producto agregado exitosamente.");
-    getch(); 
-    closegraph();
+    printf("Producto agregado exitosamente.\n");
+    getch();
 }
 
 void buscar_producto(void)
 {
+    FILE *pa;
+    pa = fopen("c:\\tc20\\product\\productos.txt", "a+");
+
+    closegraph();
+    textbackground(BLACK);
+    textcolor(WHITE);
+    clrscr();
+    printf("SECCION: BUSCAR PRODUCTO\n\n");
     clrscr();
     printf("Ingrese el nombre o el codigo del producto: ");
     scanf("%s", busqueda);
@@ -512,6 +499,13 @@ void buscar_producto(void)
 
 void actualizar_producto(void)
 {
+   
+
+    closegraph();
+    textbackground(BLACK);
+    textcolor(WHITE);
+    clrscr();
+    printf("SECCION: ACTUALIZAR PRODUCTO\n\n");
     clrscr();
     printf("Ingrese el nombre o el codigo del producto que desea actualizar: ");
     scanf("%s", busqueda);
@@ -553,6 +547,14 @@ void actualizar_producto(void)
 
 void eliminar_producto(void)
 {
+    FILE *pa;
+    pa = fopen("c:\\tc20\\product\\productos.txt", "a+");
+
+    closegraph();
+    textbackground(BLACK);
+    textcolor(WHITE);
+    clrscr();
+    printf("SECCION: ELIMINAR PRODUCTO\n\n");
     clrscr();
     printf("Ingrese el nombre o el codigo del producto que desea eliminar: ");
     scanf("%s", busqueda);
@@ -594,6 +596,14 @@ void eliminar_producto(void)
 
 void ver_productos(void)
 {
+    FILE *pa;
+    pa = fopen("c:\\tc20\\product\\productos.txt", "a+");
+
+    closegraph();
+    textbackground(BLACK);
+    textcolor(WHITE);
+    clrscr();
+    printf("SECCION: VER PRODUCTOS\n\n");
     clrscr();
     if (total_productos == 0)
     {
@@ -619,6 +629,14 @@ void ver_productos(void)
 
 void vender_producto(void)
 {
+    FILE *pa;
+    pa = fopen("c:\\tc20\\product\\productos.txt", "a+");
+
+    closegraph();
+    textbackground(BLACK);
+    textcolor(WHITE);
+    clrscr();
+    printf("SECCION: VENDER PRODUCTO\n\n");
     clrscr();
     printf("Ingrese el nombre o el codigo del producto que desea vender: ");
     scanf("%s", busqueda);
@@ -742,6 +760,11 @@ void menu_inventario(void)
     card_x = (width - 400) / 2;
     card_y = (height - 300) / 2;
 
+    closegraph();
+    textbackground(BLACK);
+    textcolor(WHITE);
+    clrscr();
+
     while (1)
     {
         cleardevice();
@@ -761,11 +784,11 @@ void menu_inventario(void)
         outtextxy(card_x + 20, card_y + 180, "7. Volver");
 
         outtextxy(card_x + 20, card_y + 210, "Seleccione una opcion: ");
-        
-        gotoxy(card_x + 20, card_y + 230);
-        gets(opcion_str);
 
-        opcion = atoi(opcion_str);
+        gotoxy(card_x + 20, card_y + 230);
+        scanf("%d", opcion);
+
+        opcion = (opcion);
 
         switch (opcion)
         {
@@ -788,8 +811,8 @@ void menu_inventario(void)
             vender_producto();
             break;
         case 7:
-            closegraph();
             return;
+            closegraph();
         default:
             outtextxy(card_x + 20, card_y + 240, "Opcion invalida.");
             getch();
@@ -801,16 +824,47 @@ void menu_inventario(void)
 
 void menu_clientes(void)
 {
+    int gd = DETECT, gm;
+    int width, height;
+    int card_x, card_y;
+    char opcion_str[10];
+
+    initgraph(&gd, &gm, "C:\\tc20\\bin");
+    width = getmaxx();
+    height = getmaxy();
+
+    closegraph();
+    textbackground(BLACK);
+    textcolor(WHITE);
+    clrscr();
+
+    card_x = (width - 400) / 2;
+    card_y = (height - 300) / 2;
+
     while (1)
     {
-        clrscr();
-        printf("1. Agregar cliente\n");
-        printf("2. Buscar clientes\n");
-        printf("3. Actualizar cliente\n");
-        printf("4. Ver clientes\n");
-        printf("5. Eliminar cliente\n");
-        printf("6. Volver\n");
-        opcion = validar(opcion);
+        cleardevice();
+        setcolor(WHITE);
+        rectangle(card_x, card_y, card_x + 400, card_y + 300);
+
+        settextstyle(DEFAULT_FONT, HORIZ_DIR, 2);
+        outtextxy((width - textwidth("* CLIENTES *")) / 2, card_y + 20, "* CLIENTES *");
+
+        settextstyle(DEFAULT_FONT, HORIZ_DIR, 1);
+        outtextxy(card_x + 20, card_y + 60, "1. Agregar cliente");
+        outtextxy(card_x + 20, card_y + 80, "2. Buscar cliente");
+        outtextxy(card_x + 20, card_y + 100, "3. Actualizar cliente");
+        outtextxy(card_x + 20, card_y + 120, "4. Ver clientes");
+        outtextxy(card_x + 20, card_y + 140, "5. Eliminar cliente");
+        outtextxy(card_x + 20, card_y + 160, "6. Volver");
+
+        outtextxy(card_x + 20, card_y + 190, "Seleccione una opcion: ");
+
+        gotoxy(card_x + 20, card_y + 210);
+        gets(opcion_str);
+
+        opcion = atoi(opcion_str);
+
         switch (opcion)
         {
         case 1:
@@ -830,10 +884,13 @@ void menu_clientes(void)
             break;
         case 6:
             return;
+            closegraph();
         default:
-            printf("Opcion invalida");
-            break;
+            outtextxy(card_x + 20, card_y + 230, "Opcion invalida.");
+            getch();
         }
+
+        delay(500);
     }
 }
 
@@ -848,6 +905,11 @@ void menu_principal(void)
     initgraph(&gd, &gm, "C:\\tc20\\bin");
     width = getmaxx();
     height = getmaxy();
+
+    closegraph();
+    textbackground(BLACK);
+    textcolor(WHITE);
+    clrscr();
 
     while (1)
     {
@@ -923,7 +985,6 @@ void menu_principal(void)
         }
     }
 }
-
 
 void drawUNI(void)
 {
@@ -1045,7 +1106,6 @@ void inicio(void)
 
     closegraph();
 }
-
 
 int main()
 {
