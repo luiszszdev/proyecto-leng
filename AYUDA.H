@@ -200,3 +200,4 @@ void menuayuda(void){
            getch(); 
     }
 }
+
